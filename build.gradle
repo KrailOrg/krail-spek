@@ -53,6 +53,11 @@ ext.slf4jVersion = '1.7.6'
 repositories {
     jcenter()
     mavenCentral()
+    maven {
+        url {
+            "http://maven.vaadin.com/vaadin-addons"
+        }
+    }
 }
 
 kaytee {
@@ -108,6 +113,7 @@ dependencies {
 
 
     testCompile   'uk.q3c.krail:krail:0.14.0.0'
+    testCompile 'uk.q3c.util:q3c-testutils:0.11.0.4'
 
 }
 
