@@ -10,6 +10,7 @@ import org.jetbrains.spek.api.dsl.context
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import uk.q3c.krail.core.validation.KrailInterpolator
+import uk.q3c.krail.core.validation.KrailValidationModule
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 
@@ -22,9 +23,9 @@ const val interpolatorMessage = "message from Krail interpolator"
 class AutoBind : Spek({
     lateinit var easyBinder: EasyBinder
 
-    context("we want to ensure that the KrailMessageINterpolator is used during validation") {
+    context("we want to ensure that the KrailMessageInterpolator is used during validation") {
         beforeGroup {
-            val injector = Guice.createInjector(FormsModule(), LocalTestModule())
+            val injector = Guice.createInjector(KrailValidationModule(), LocalTestModule())
             easyBinder = injector.getInstance(EasyBinder::class.java)
         }
 

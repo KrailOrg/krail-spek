@@ -112,7 +112,7 @@ dependencies {
     }
 
 
-    testCompile   'uk.q3c.krail:krail:0.14.0.0'
+    testCompile   'uk.q3c.krail:krail:0.15.0.0'
     testCompile 'uk.q3c.util:q3c-testutils:0.11.0.4'
 
 }
