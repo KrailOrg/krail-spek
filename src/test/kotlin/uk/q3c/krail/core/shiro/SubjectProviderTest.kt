@@ -5,12 +5,9 @@ import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
-import com.nhaarman.mockito_kotlin.reset
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import com.vaadin.server.VaadinSession
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jws
 import net.engio.mbassy.bus.common.PubSubSupport
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeFalse
@@ -27,7 +24,6 @@ import org.apache.shiro.realm.AuthorizingRealm
 import org.apache.shiro.realm.Realm
 import org.apache.shiro.subject.PrincipalCollection
 import org.apache.shiro.subject.SimplePrincipalCollection
-import org.apache.shiro.subject.Subject
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -35,6 +31,7 @@ import org.jetbrains.spek.api.dsl.on
 import org.mockito.InOrder
 import org.mockito.Mockito
 import uk.q3c.krail.core.eventbus.SessionBusProvider
+import uk.q3c.krail.core.user.DefaultUserObjectProvider
 import uk.q3c.krail.core.user.UserHasLoggedIn
 import uk.q3c.krail.core.user.UserHasLoggedOut
 import uk.q3c.krail.core.user.UserLoginFailed
@@ -49,19 +46,32 @@ import java.util.concurrent.locks.Lock
 object DefaultSubjectProviderTest : Spek({
 
     given("a SubjectProvider") {
-        val realm = MockRealm()
-        val securityManager = KrailSecurityManager(ImmutableList.of(realm) as Collection<Realm>?, Optional.empty())
-        val eventBusProvider: SessionBusProvider = mock()
-        val eventBus: PubSubSupport<BusMessage> = mock()
-        whenever(eventBusProvider.get()).thenReturn(eventBus)
-        val jwtProvider: JWTProvider<Jws<Claims>> = mock()
-        val subjectProvider = DefaultSubjectProvider(securityManager, eventBusProvider, jwtProvider)
-        val session: VaadinSession = mock()
-        val lock: Lock = mock()
-        val source: UserStatusChangeSource = mock()
-        VaadinSession.setCurrent(session)
-        whenever(session.lockInstance).thenReturn(lock)
-        whenever(jwtProvider.encodeToJWT(any<Subject>())).thenReturn("wiggly")
+        val jwtProvider = DefaultJWTProvider(DefaultJWTKeyProvider(), DefaultUserObjectProvider())
+        lateinit var realm: MockRealm
+        lateinit var securityManager: KrailSecurityManager
+        lateinit var eventBusProvider: SessionBusProvider
+        lateinit var eventBus: PubSubSupport<BusMessage>
+        lateinit var subjectProvider: SubjectProvider
+        lateinit var session: VaadinSession
+        lateinit var lock: Lock
+        lateinit var source: UserStatusChangeSource
+
+        beforeEachTest {
+            realm = MockRealm()
+            securityManager = KrailSecurityManager(ImmutableList.of(realm) as Collection<Realm>?, Optional.empty())
+            eventBusProvider = mock()
+            eventBus = mock()
+
+            subjectProvider = DefaultSubjectProvider(securityManager, eventBusProvider, jwtProvider)
+            session = mock()
+            lock = mock()
+            source = mock()
+
+            VaadinSession.setCurrent(session)
+            whenever(eventBusProvider.get()).thenReturn(eventBus)
+            whenever(session.lockInstance).thenReturn(lock)
+
+        }
 
 
         on("get when there is no subject in the session") {
@@ -69,10 +79,6 @@ object DefaultSubjectProviderTest : Spek({
 
             it("returns an anonymous subject") {
                 subject.principal.shouldBeNull()
-            }
-
-            it("does not attempt to retrieve token object") {
-                verify(jwtProvider, never()).tokenAsObject(any())
             }
 
             it("does not store JWT in session, as user not authenticated") {
@@ -87,13 +93,7 @@ object DefaultSubjectProviderTest : Spek({
 
         on("get when there is a valid subject store in the session") {
 
-            whenever(session.getAttribute(SUBJECT_ATTRIBUTE)).thenReturn("beastie")
-            val tokenObject: Jws<Claims> = mock()
-            whenever(jwtProvider.tokenAsObject("beastie")).thenReturn(tokenObject)
-            val body: Claims = mock()
-            whenever(tokenObject.body).thenReturn(body)
-            whenever(body.subject).thenReturn("david")
-            whenever(body.get("realmName")).thenReturn("default")
+            whenever(session.getAttribute(SUBJECT_ATTRIBUTE)).thenReturn(validHeadlessJWT())
             val subject = subjectProvider.get()
 
             it("returns a Subject with correct principal") {
@@ -118,13 +118,12 @@ object DefaultSubjectProviderTest : Spek({
             it("stores a JWT in the session") {
                 val orderVerifier: InOrder = Mockito.inOrder(lock, session, lock)
                 orderVerifier.verify(lock).lock()
-                orderVerifier.verify(session).setAttribute(SUBJECT_ATTRIBUTE, jwtProvider.encodeToJWT(subject))
+                orderVerifier.verify(session).setAttribute(SUBJECT_ATTRIBUTE, jwtProvider.encodeToHeadlessJWT(subject))
                 orderVerifier.verify(lock).unlock()
             }
         }
 
         on("unsuccessful login attempt") {
-            reset(eventBus)
             val authenticationToken = UsernamePasswordToken("david", "rubbish")
             val subject = subjectProvider.login(source, authenticationToken)
 
@@ -137,12 +136,12 @@ object DefaultSubjectProviderTest : Spek({
             }
 
             it("returns an anonymous subject") {
-                subject.principal.shouldBe("david")
+                subject.principal.shouldBeNull()
             }
         }
 
-        on("logout") {
-            reset(eventBus)
+        on("logout from being logged in") {
+            whenever(session.getAttribute(SUBJECT_ATTRIBUTE)).thenReturn(validHeadlessJWT())
             subjectProvider.logout(source)
 
             it("sends a UserHasLoggedOut event") {
@@ -176,4 +175,8 @@ class MockRealm : AuthorizingRealm() {
         return account
     }
 
+}
+
+fun validHeadlessJWT(): String {
+    return "eyJzdWIiOiJkYXZpZCJ9.hUsNuHefSBZw_BvB8Ht7NzxtxFf0xuSx76jMqcxPx2TZP5iDKbPSBDhiDmGsPNcIlEOi5-Gi7MNSTGnvBClC6g"
 }
