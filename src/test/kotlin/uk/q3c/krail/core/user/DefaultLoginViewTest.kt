@@ -1,8 +1,10 @@
 package uk.q3c.krail.core.user
 
 import com.google.common.collect.ImmutableSet
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import com.vaadin.event.ListenerMethod
 import net.engio.mbassy.bus.common.PubSubSupport
@@ -10,6 +12,7 @@ import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotBeNull
 import org.amshove.kluent.shouldThrow
+import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.subject.Subject
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -106,6 +109,16 @@ object DefaultLoginViewTest : Spek({
 
             it("should be successful") {
                 viewFieldChecker.check().shouldBeTrue()
+            }
+        }
+
+        on("submitting credentials") {
+            view.buildView(event)
+            view.username("a").password("password")
+            view.submit.click()
+
+            it("calls SubjectProvider to login") {
+                verify(subjectProvider).login(eq(view), any<UsernamePasswordToken>())
             }
         }
 
