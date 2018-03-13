@@ -12,7 +12,7 @@ import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
-import uk.q3c.krail.core.user.DefaultUserObjectProvider
+import uk.q3c.krail.core.user.DefaultUserQueryDao
 
 
 /**
@@ -25,7 +25,7 @@ object DefaultJWTProviderTest : Spek({
 
     given("a JWT Provider") {
         val jwtKeyProvider = DefaultJWTKeyProvider()
-        val provider = DefaultJWTProvider(jwtKeyProvider, DefaultUserObjectProvider())
+        val provider = DefaultJWTProvider(jwtKeyProvider, DefaultUserQueryDao())
 
         lateinit var validSubject: Subject
         lateinit var principals: PrincipalCollection

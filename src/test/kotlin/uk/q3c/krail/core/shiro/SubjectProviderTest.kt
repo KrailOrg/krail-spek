@@ -31,7 +31,7 @@ import org.jetbrains.spek.api.dsl.on
 import org.mockito.InOrder
 import org.mockito.Mockito
 import uk.q3c.krail.core.eventbus.SessionBusProvider
-import uk.q3c.krail.core.user.DefaultUserObjectProvider
+import uk.q3c.krail.core.user.DefaultUserQueryDao
 import uk.q3c.krail.core.user.UserHasLoggedIn
 import uk.q3c.krail.core.user.UserHasLoggedOut
 import uk.q3c.krail.core.user.UserLoginFailed
@@ -46,7 +46,7 @@ import java.util.concurrent.locks.Lock
 object DefaultSubjectProviderTest : Spek({
 
     given("a SubjectProvider") {
-        val jwtProvider = DefaultJWTProvider(DefaultJWTKeyProvider(), DefaultUserObjectProvider())
+        val jwtProvider = DefaultJWTProvider(DefaultJWTKeyProvider(), DefaultUserQueryDao())
         lateinit var realm: MockRealm
         lateinit var securityManager: KrailSecurityManager
         lateinit var eventBusProvider: SessionBusProvider
@@ -62,7 +62,7 @@ object DefaultSubjectProviderTest : Spek({
             eventBusProvider = mock()
             eventBus = mock()
 
-            subjectProvider = DefaultSubjectProvider(securityManager, eventBusProvider, jwtProvider)
+            subjectProvider = DefaultSubjectProvider(securityManager, eventBusProvider, DefaultUserQueryDao(), jwtProvider)
             session = mock()
             lock = mock()
             source = mock()
@@ -146,6 +146,13 @@ object DefaultSubjectProviderTest : Spek({
 
             it("sends a UserHasLoggedOut event") {
                 verify(eventBus).publish(any<UserHasLoggedOut>())
+            }
+
+            it("removes the JWT from the session") {
+                val orderVerifier: InOrder = Mockito.inOrder(lock, session, lock)
+                orderVerifier.verify(lock).lock()
+                orderVerifier.verify(session).setAttribute(SUBJECT_ATTRIBUTE, null)
+                orderVerifier.verify(lock).unlock()
             }
         }
 

@@ -32,6 +32,7 @@ import java.util.*
 object DefaultUserStatusPanelTest : Spek({
 
     given("a user status panel") {
+        val source: UserStatusChangeSource = mock()
         lateinit var panel: DefaultUserStatusPanel
         lateinit var subject: Subject
         lateinit var subjectProvider: SubjectProvider
@@ -94,7 +95,7 @@ object DefaultUserStatusPanelTest : Spek({
 
         given("a user has logged in") {
             on(" building with an authenticated subject") {
-                panel.handleUserHasLoggedIn(UserHasLoggedIn(aggregateId = "david@somewhere.com", knownAs = "david"))
+                panel.handleUserHasLoggedIn(UserHasLoggedIn(aggregateId = "david@somewhere.com", knownAs = "david", source = source))
 
                 it("shows the correct labels") {
                     panel.actionLabel.shouldEqual("log out")
@@ -103,7 +104,7 @@ object DefaultUserStatusPanelTest : Spek({
             }
 
             on("clicking 'log out' while logged in") {
-                panel.handleUserHasLoggedIn(UserHasLoggedIn(aggregateId = "david@somewhere.com", knownAs = "david"))
+                panel.handleUserHasLoggedIn(UserHasLoggedIn(aggregateId = "david@somewhere.com", knownAs = "david", source = source))
                 panel.login_logout_Button.click()
 
                 it("logout is invoked") {
@@ -115,7 +116,7 @@ object DefaultUserStatusPanelTest : Spek({
 
         given("a user has logged out") {
             on(" building with an anonymous subject") {
-                panel.handleUserHasLoggedOut(UserHasLoggedOut(aggregateId = "david@somewhere.com", knownAs = "david"))
+                panel.handleUserHasLoggedOut(UserHasLoggedOut(aggregateId = "david@somewhere.com", knownAs = "david", source = source))
                 panel.configureDisplay()
 
                 it("shows the correct labels") {
