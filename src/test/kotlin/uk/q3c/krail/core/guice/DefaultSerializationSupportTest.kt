@@ -6,6 +6,7 @@ import com.google.inject.Inject
 import com.google.inject.name.Named
 import com.google.inject.name.Names
 import org.amshove.kluent.shouldBeInstanceOf
+import org.amshove.kluent.shouldBeNull
 import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotBeNull
@@ -103,10 +104,18 @@ object DefaultSerializationSupportTest : Spek({
         }
 
         given("an instance which has two fields of the same type, that need injection, one field missing annotation.  Missing field is excluded") {
+            val testViewClass = ClassWithExcludedField::class.java
             on("deserialization") {
-
+                val testView = locator.get().getInstance(testViewClass)
+                val output = SerializationUtils.serialize(testView)
                 it("passes its check") {
-                    TODO()
+                    val result = SerializationUtils.deserialize<ClassWithExcludedField>(output)
+                    result.translate.shouldNotBeNull()
+                    isMock(result.translate).shouldBeTrue()
+                    result.serializationSupport.shouldNotBeNull()
+                    result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
+                    result.dummy1.shouldBeNull()
+                    result.dummy2.age.shouldEqual(99)
                 }
             }
         }
@@ -173,7 +182,7 @@ class ClassWithTwoGuiceInjections @Inject constructor(translate: Translate, seri
     }
 }
 
-class ClassWithTwoAnnotatedGuiceInjections @Inject constructor(
+open class ClassWithTwoAnnotatedGuiceInjections @Inject constructor(
         translate: Translate,
         serializationSupport: SerializationSupport,
         @field:Named("1") @param:Named("1") @Transient val dummy1: Dummy1,
@@ -185,7 +194,7 @@ class ClassWithTwoAnnotatedGuiceInjections @Inject constructor(
 }
 
 
-class ClassWithMissingGuiceFieldAnnotation @Inject constructor(
+open class ClassWithMissingGuiceFieldAnnotation @Inject constructor(
         translate: Translate,
         serializationSupport: SerializationSupport,
         @field:Named("1") @param:Named("1") @Transient val dummy1: Dummy1,
@@ -193,6 +202,21 @@ class ClassWithMissingGuiceFieldAnnotation @Inject constructor(
 
     override fun doBuild(busMessage: ViewChangeBusMessage?) {
 
+    }
+}
+
+open class ClassWithExcludedField @Inject constructor(
+        translate: Translate,
+        serializationSupport: SerializationSupport,
+        @param:Named("1") @Transient val dummy1: Dummy1,
+        @field:Named("2") @param:Named("2") @Transient val dummy2: Dummy1) : Serializable, ViewBase(translate, serializationSupport) {
+
+    override fun doBuild(busMessage: ViewChangeBusMessage?) {
+
+    }
+
+    override fun beforeTransientInjection() {
+        serializationSupport.excludedFieldNames = listOf("dummy1")
     }
 }
 
