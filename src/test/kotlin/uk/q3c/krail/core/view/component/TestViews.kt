@@ -1,7 +1,12 @@
 package uk.q3c.krail.core.view.component
 
 import com.google.inject.Inject
-import com.vaadin.ui.*
+import com.vaadin.ui.Component
+import com.vaadin.ui.Label
+import com.vaadin.ui.Panel
+import com.vaadin.ui.TextField
+import com.vaadin.ui.VerticalLayout
+import uk.q3c.krail.core.guice.SerializationSupport
 import uk.q3c.krail.core.view.ViewBase
 import uk.q3c.krail.i18n.Translate
 
@@ -10,7 +15,7 @@ import uk.q3c.krail.i18n.Translate
  */
 
 
-class TestView0 @Inject constructor(translate: Translate) : ViewBase(translate) {
+class TestView0 @Inject constructor(translate: Translate, serialisationSupport: SerializationSupport) : ViewBase(translate, serialisationSupport) {
 
 
     override fun doBuild(busMessage: ViewChangeBusMessage?) {
@@ -19,14 +24,14 @@ class TestView0 @Inject constructor(translate: Translate) : ViewBase(translate) 
 
 }
 
-class TestView1 @Inject constructor(translate: Translate) : ViewBase(translate) {
+class TestView1 @Inject constructor(translate: Translate, serialisationSupport: SerializationSupport) : ViewBase(translate, serialisationSupport) {
     lateinit var box1: TextField
     override fun doBuild(busMessage: ViewChangeBusMessage?) {
         box1 = TextField()
     }
 }
 
-class TestView2 @Inject constructor(translate: Translate) : ViewBase(translate) {
+class TestView2 @Inject constructor(translate: Translate, serialisationSupport: SerializationSupport) : ViewBase(translate, serialisationSupport) {
     lateinit var box1: TextField
     lateinit var layout1: VerticalLayout
     override fun doBuild(busMessage: ViewChangeBusMessage?) {
@@ -60,7 +65,7 @@ interface SpecialComponentInterface : Component{
 }
 
 
-class FullMontyView @Inject constructor(translate: Translate) : ViewBase(translate) {
+class FullMontyView @Inject constructor(translate: Translate, serialisationSupport: SerializationSupport) : ViewBase(translate, serialisationSupport) {
     lateinit var componentInView: TextField
     @AssignComponentId(assign = false, drilldown = false)
     lateinit var componentInViewExcluded: TextField

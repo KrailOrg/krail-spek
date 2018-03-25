@@ -19,6 +19,7 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import uk.q3c.krail.core.eventbus.SessionBusProvider
+import uk.q3c.krail.core.guice.SerializationSupport
 import uk.q3c.krail.core.i18n.LabelKey
 import uk.q3c.krail.core.shiro.SubjectProvider
 import uk.q3c.krail.core.view.component.ViewChangeBusMessage
@@ -40,12 +41,13 @@ object DefaultLoginViewTest : Spek({
         lateinit var eventBus: PubSubSupport<BusMessage>
         lateinit var subjectProvider: SubjectProvider
         lateinit var translate: Translate
-
+        lateinit var serialisationSupport: SerializationSupport
 
 
         beforeEachTest {
             subject = mock()
             subjectProvider = mock()
+            serialisationSupport = mock()
             whenever(subjectProvider.get()).thenReturn(subject)
             sessionBusProvider = mock()
             eventBus = mock()
@@ -53,7 +55,8 @@ object DefaultLoginViewTest : Spek({
             translate = mock()
             whenever(translate.from(eq(LabelKey.Active_Source))).thenReturn("Active Source")
             whenever(translate.from(eq(LoginDescriptionKey.Account_Locked))).thenReturn("Your account is locked")
-            view = DefaultLoginView(subjectProvider, translate)
+
+            view = DefaultLoginView(subjectProvider, translate, serialisationSupport)
         }
 
         on("checking getters and setters") {

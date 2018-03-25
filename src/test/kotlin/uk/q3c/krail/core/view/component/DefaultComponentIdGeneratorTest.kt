@@ -1,10 +1,17 @@
 package uk.q3c.krail.core.view.component
 
-import org.amshove.kluent.*
+import org.amshove.kluent.mock
+import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldBeNull
+import org.amshove.kluent.shouldContain
+import org.amshove.kluent.shouldNotContain
+import org.amshove.kluent.shouldThrow
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
+import uk.q3c.krail.core.guice.SerializationSupport
 import uk.q3c.krail.i18n.Translate
 import uk.q3c.util.clazz.DefaultUnenhancedClassIdentifier
 
@@ -16,9 +23,10 @@ class DefaultComponentIdGeneratorTest : Spek({
         val generator = DefaultComponentIdGenerator(DefaultUnenhancedClassIdentifier())
         val translate: Translate = mock()
         val message: ViewChangeBusMessage = mock()
+        val serializationSupport: SerializationSupport = mock()
 
         given("a view with a single component") {
-            val view = TestView1(translate)
+            val view = TestView1(translate, serializationSupport)
             view.buildView(message)
 
 
@@ -34,7 +42,7 @@ class DefaultComponentIdGeneratorTest : Spek({
         }
 
         given("a view with no components") {
-            val view = TestView0(translate)
+            val view = TestView0(translate, serializationSupport)
             view.buildView(message)
 
             on("generate") {
@@ -48,7 +56,7 @@ class DefaultComponentIdGeneratorTest : Spek({
         }
 
         given("a view with components and layout components") {
-            val view = TestView2(translate)
+            val view = TestView2(translate, serializationSupport)
             view.buildView(message)
 
             on("apply") {
@@ -63,7 +71,7 @@ class DefaultComponentIdGeneratorTest : Spek({
         }
 
         given("a view with all combinations of components") {
-            val view = FullMontyView(translate)
+            val view = FullMontyView(translate, serializationSupport)
             view.buildView(message)
 
             on("generate and apply") {
