@@ -20,6 +20,10 @@ import org.mockito.Mockito
 import uk.q3c.krail.core.view.ViewBase
 import uk.q3c.krail.core.view.component.ViewChangeBusMessage
 import uk.q3c.krail.i18n.Translate
+import uk.q3c.util.guice.DefaultSerializationSupport
+import uk.q3c.util.guice.InjectorLocator
+import uk.q3c.util.guice.SerializationSupport
+import uk.q3c.util.guice.SerializationSupportException
 import java.io.Serializable
 
 /**
@@ -122,14 +126,40 @@ object DefaultSerializationSupportTest : Spek({
 
 
         given("an instance which has two fields of the same type, that need injection, fields annotated correctly, but one filled by user code before injection and one after injection") {
+            val testViewClass = ClassWithDeeperInheritanceAndOverridingInjection::class.java
             on("deserialization") {
+                val testView = locator.get().getInstance(testViewClass)
+                val output = SerializationUtils.serialize(testView)
 
-                it(" passes its check") {
-                    //                    support.checkForNullTransients()
+                it("fills fields by user code action, not injection") {
+                    val result = SerializationUtils.deserialize<ClassWithDeeperInheritanceAndOverridingInjection>(output)
+                    result.translate.shouldNotBeNull()
+                    isMock(result.translate).shouldBeTrue()
+                    result.serializationSupport.shouldNotBeNull()
+                    result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
+                    result.dummy1.age.shouldEqual(123)
+                    result.dummy2.age.shouldEqual(199)
+                    result.dummy3.shouldBeInstanceOf(Dummy2::class.java)
                 }
+            }
+        }
 
-                it("fields are filled by user code action, not injection") {
-                    TODO()
+
+        given("an instance which has two fields of the same type, deeper inheritance") {
+            val testViewClass = ClassWithDeeperInheritance::class.java
+            on("deserialization") {
+                val testView = locator.get().getInstance(testViewClass)
+                val output = SerializationUtils.serialize(testView)
+
+                it("fills all fields, with no errors") {
+                    val result = SerializationUtils.deserialize<ClassWithDeeperInheritance>(output)
+                    result.translate.shouldNotBeNull()
+                    isMock(result.translate).shouldBeTrue()
+                    result.serializationSupport.shouldNotBeNull()
+                    result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
+                    result.dummy1.age.shouldEqual(23)
+                    result.dummy2.age.shouldEqual(99)
+                    result.dummy3.shouldBeInstanceOf(Dummy2::class.java)
                 }
             }
         }
@@ -138,7 +168,7 @@ object DefaultSerializationSupportTest : Spek({
 })
 
 fun isMock(obj: Any): Boolean {
-    return obj.javaClass.name.contains("\$\$EnhancerByMockito")
+    return obj.javaClass.name.contains("Mockito")
 }
 
 val translate: Translate = Mockito.mock(Translate::class.java)
@@ -185,8 +215,8 @@ class ClassWithTwoGuiceInjections @Inject constructor(translate: Translate, seri
 open class ClassWithTwoAnnotatedGuiceInjections @Inject constructor(
         translate: Translate,
         serializationSupport: SerializationSupport,
-        @field:Named("1") @param:Named("1") @Transient val dummy1: Dummy1,
-        @field:Named("2") @param:Named("2") @Transient val dummy2: Dummy1) : Serializable, ViewBase(translate, serializationSupport) {
+        @field:Named("1") @param:Named("1") @Transient var dummy1: Dummy1,
+        @field:Named("2") @param:Named("2") @Transient var dummy2: Dummy1) : Serializable, ViewBase(translate, serializationSupport) {
 
     override fun doBuild(busMessage: ViewChangeBusMessage?) {
 
@@ -219,6 +249,18 @@ open class ClassWithExcludedField @Inject constructor(
         serializationSupport.excludedFieldNames = listOf("dummy1")
     }
 }
+
+class ClassWithDeeperInheritanceAndOverridingInjection @Inject constructor(translate: Translate, serializationSupport: SerializationSupport, @Named("1") dummy1: Dummy1, @Named("2") dummy2: Dummy1, @Transient val dummy3: Dummy2) : ClassWithTwoAnnotatedGuiceInjections(translate, serializationSupport, dummy1, dummy2) {
+
+    override fun beforeTransientInjection() {
+        dummy1 = Dummy1()
+        dummy1.age = 123
+        dummy2 = Dummy1()
+        dummy2.age = 199
+    }
+}
+
+class ClassWithDeeperInheritance @Inject constructor(translate: Translate, serializationSupport: SerializationSupport, @Named("1") dummy1: Dummy1, @Named("2") dummy2: Dummy1, @Transient val dummy3: Dummy2) : ClassWithTwoAnnotatedGuiceInjections(translate, serializationSupport, dummy1, dummy2)
 
 
 class Dummy1 @Inject constructor() {

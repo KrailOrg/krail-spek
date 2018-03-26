@@ -19,13 +19,13 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import uk.q3c.krail.core.eventbus.SessionBusProvider
-import uk.q3c.krail.core.guice.SerializationSupport
 import uk.q3c.krail.core.i18n.LabelKey
 import uk.q3c.krail.core.shiro.SubjectProvider
 import uk.q3c.krail.core.view.component.ViewChangeBusMessage
 import uk.q3c.krail.eventbus.BusMessage
 import uk.q3c.krail.i18n.Translate
 import uk.q3c.krail.testutil.view.ViewFieldChecker
+import uk.q3c.util.guice.SerializationSupport
 
 /**
  * Created by David Sowerby on 10 Mar 2018

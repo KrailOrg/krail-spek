@@ -3,7 +3,7 @@ package uk.q3c.krail.core.guice
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldContain
-import org.amshove.kluent.shouldThrow
+import org.amshove.kluent.shouldEqual
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -29,31 +29,44 @@ object BootstrapConfigTest : Spek({
 
             it("correctly sets up config object") {
                 with(bootstrapConfig) {
-                    servletConfig.collatorClassName.shouldBeEqualTo("uk.q3c.krail.core.guice.CoreBindingsCollator")
-                    vertxConfig.collatorClassName.shouldBeEqualTo("uk.q3c.krail.core.guice.CoreBindingsCollator")
-                    servletConfig.additionalModules.shouldBeEmpty()
-                    vertxConfig.additionalModules.shouldContain("uk.q3c.krail.core.vaadin.DataModule")
+                    version.shouldEqual(1)
+                    collator.shouldBeEqualTo("uk.q3c.krail.core.guice.CoreBindingsCollator")
+                    modules.shouldContain("uk.q3c.krail.core.vaadin.DataModule")
+                    servletConfig.additionalModules.shouldContain("uk.q3c.krail.core.guice.ServletEnvironmentModule")
+                    vertxConfig.additionalModules.shouldContain("uk.q3c.krail.core.guice.VertxEnvironmentModule")
                 }
             }
         }
 
-        on("loading a bootstrap file with vertx missing") {
+        on("optional elements missing") {
             val sourceFile = TestResource.resource(resourceReference, "krail-bootstrap2.yml")
             val source = sourceFile!!.readText()
-            val expects = { BootstrapYAMLReader().read(source) }
+            bootstrapConfig = BootstrapYAMLReader().read(source)
 
-            it("throws an exception") {
-                expects.shouldThrow(EnvironmentConfigurationException::class)
+            it("uses defaults") {
+                with(bootstrapConfig) {
+                    version.shouldEqual(1)
+                    collator.shouldBeEqualTo("uk.q3c.krail.core.guice.CoreBindingsCollator")
+                    modules.shouldBeEmpty()
+                    servletConfig.additionalModules.shouldContain("uk.q3c.krail.core.guice.ServletEnvironmentModule")
+                    vertxConfig.additionalModules.shouldContain("uk.q3c.krail.core.guice.VertxEnvironmentModule")
+                }
             }
         }
 
-        on("loading a bootstrap file with servlet missing") {
+        on("environment module elements missing or empty") {
             val sourceFile = TestResource.resource(resourceReference, "krail-bootstrap3.yml")
             val source = sourceFile!!.readText()
-            val expects = { BootstrapYAMLReader().read(source) }
+            bootstrapConfig = BootstrapYAMLReader().read(source)
 
             it("throws an exception") {
-                expects.shouldThrow(EnvironmentConfigurationException::class)
+                with(bootstrapConfig) {
+                    version.shouldEqual(1)
+                    collator.shouldBeEqualTo("uk.q3c.krail.core.guice.CoreBindingsCollator")
+                    modules.shouldContain("uk.q3c.krail.core.vaadin.DataModule")
+                    servletConfig.additionalModules.shouldContain("uk.q3c.krail.core.guice.ServletEnvironmentModule")
+                    vertxConfig.additionalModules.shouldBeEmpty()
+                }
             }
         }
     }

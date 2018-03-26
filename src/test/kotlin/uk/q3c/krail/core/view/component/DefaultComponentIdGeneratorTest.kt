@@ -11,9 +11,9 @@ import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
-import uk.q3c.krail.core.guice.SerializationSupport
 import uk.q3c.krail.i18n.Translate
 import uk.q3c.util.clazz.DefaultUnenhancedClassIdentifier
+import uk.q3c.util.guice.SerializationSupport
 
 /**
  * Created by David Sowerby on 27 Jan 2018

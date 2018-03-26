@@ -37,6 +37,7 @@ import uk.q3c.krail.core.user.UserHasLoggedOut
 import uk.q3c.krail.core.user.UserLoginFailed
 import uk.q3c.krail.core.user.status.UserStatusChangeSource
 import uk.q3c.krail.eventbus.BusMessage
+import uk.q3c.util.guice.SerializationSupport
 import java.util.*
 import java.util.concurrent.locks.Lock
 
@@ -55,14 +56,16 @@ object DefaultSubjectProviderTest : Spek({
         lateinit var session: VaadinSession
         lateinit var lock: Lock
         lateinit var source: UserStatusChangeSource
+        lateinit var serializationSupport: SerializationSupport
 
         beforeEachTest {
+            serializationSupport = mock()
             realm = MockRealm()
             securityManager = KrailSecurityManager(ImmutableList.of(realm) as Collection<Realm>?, Optional.empty())
             eventBusProvider = mock()
             eventBus = mock()
 
-            subjectProvider = DefaultSubjectProvider(securityManager, eventBusProvider, DefaultUserQueryDao(), jwtProvider)
+            subjectProvider = DefaultSubjectProvider(serializationSupport, securityManager, eventBusProvider, DefaultUserQueryDao(), jwtProvider)
             session = mock()
             lock = mock()
             source = mock()

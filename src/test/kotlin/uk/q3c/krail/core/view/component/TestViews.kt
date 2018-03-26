@@ -6,9 +6,9 @@ import com.vaadin.ui.Label
 import com.vaadin.ui.Panel
 import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
-import uk.q3c.krail.core.guice.SerializationSupport
 import uk.q3c.krail.core.view.ViewBase
 import uk.q3c.krail.i18n.Translate
+import uk.q3c.util.guice.SerializationSupport
 
 /**
  * Created by David Sowerby on 27 Jan 2018

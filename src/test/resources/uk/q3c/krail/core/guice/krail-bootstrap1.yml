@@ -1,6 +1,10 @@
+version: 1
+collator: uk.q3c.krail.core.guice.CoreBindingsCollator
+modules:
+  - uk.q3c.krail.core.vaadin.DataModule
 servlet:
- collator: uk.q3c.krail.core.guice.CoreBindingsCollator
-vertx:
- collator: uk.q3c.krail.core.guice.CoreBindingsCollator
  modules:
-   - uk.q3c.krail.core.vaadin.DataModule
+  - uk.q3c.krail.core.guice.ServletEnvironmentModule
+vertx:
+  modules:
+   - uk.q3c.krail.core.guice.VertxEnvironmentModule

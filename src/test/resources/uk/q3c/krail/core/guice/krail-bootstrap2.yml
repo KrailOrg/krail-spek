@@ -1,2 +1,1 @@
-servlet:
- collator: uk.q3c.krail.core.guice.CoreBindingsCollator
+collator: uk.q3c.krail.core.guice.CoreBindingsCollator
