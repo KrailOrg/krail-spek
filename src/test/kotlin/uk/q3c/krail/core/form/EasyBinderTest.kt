@@ -4,13 +4,19 @@ import com.google.inject.AbstractModule
 import com.google.inject.Guice
 import com.nhaarman.mockito_kotlin.whenever
 import com.vaadin.ui.TextField
-import org.amshove.kluent.*
+import org.amshove.kluent.any
+import org.amshove.kluent.mock
+import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeInstanceOf
+import org.amshove.kluent.shouldContain
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.context
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
+import uk.q3c.krail.core.guice.ServletEnvironmentModule
 import uk.q3c.krail.core.validation.KrailInterpolator
 import uk.q3c.krail.core.validation.KrailValidationModule
+import uk.q3c.util.guice.SerializationSupportModule
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 
@@ -25,7 +31,7 @@ class AutoBind : Spek({
 
     context("we want to ensure that the KrailMessageInterpolator is used during validation") {
         beforeGroup {
-            val injector = Guice.createInjector(KrailValidationModule(), LocalTestModule())
+            val injector = Guice.createInjector(KrailValidationModule(), LocalTestModule(), SerializationSupportModule(), ServletEnvironmentModule())
             easyBinder = injector.getInstance(EasyBinder::class.java)
         }
 

@@ -29,142 +29,131 @@ import java.io.Serializable
 /**
  * Created by David Sowerby on 17 Mar 2018
  */
+
+fun <T : Serializable> serialize(testViewClass: Class<out T>): ByteArray? {
+    val locator = ServletInjectorLocator()
+    locator.put(Guice.createInjector(TestModule(), Dummy1Module()))
+    val testView = locator.get().getInstance(testViewClass)
+    return SerializationUtils.serialize(testView)
+}
+
 object DefaultSerializationSupportTest : Spek({
 
-    given("An injector has been set up") {
 
-        val locator = ServletInjectorLocator()
-        locator.put(Guice.createInjector(TestModule(), Dummy1Module()))
+    given("an instance that needs no guice injections") {
 
+        on("serialization / deserialization") {
 
-        given("an instance that needs no guice injections") {
-            val testViewClass = ClassWithNoGuiceInjections::class.java
+            val output = serialize(ClassWithNoGuiceInjections::class.java)
 
-            on("deserialization") {
-                val testView = locator.get().getInstance(testViewClass)
-                val output = SerializationUtils.serialize(testView)
-
-                it(" passes its check") {
-                    val result = SerializationUtils.deserialize<ClassWithNoGuiceInjections>(output)
-                    result.translate.shouldNotBeNull()
-                    isMock(result.translate).shouldBeTrue()
-                    result.serializationSupport.shouldNotBeNull()
-                    result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
-
-                }
-            }
-        }
-
-        given("an instance which has two fields that need injection") {
-            val testViewClass = ClassWithTwoGuiceInjections::class.java
-            on("deserialization") {
-                val testView = locator.get().getInstance(testViewClass)
-                val output = SerializationUtils.serialize(testView)
-
-                it("populates both fields") {
-                    val result = SerializationUtils.deserialize<ClassWithTwoGuiceInjections>(output)
-                    result.translate.shouldNotBeNull()
-                    isMock(result.translate).shouldBeTrue()
-                    result.serializationSupport.shouldNotBeNull()
-                    result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
-                    result.dummy1.shouldBeInstanceOf(Dummy1::class)
-                    result.dummy2.shouldBeInstanceOf(Dummy2::class)
-                }
+            it(" passes its check") {
+                val result = SerializationUtils.deserialize<ClassWithNoGuiceInjections>(output)
+                result.translate.shouldNotBeNull()
+                isMock(result.translate).shouldBeTrue()
+                result.serializationSupport.shouldNotBeNull()
+                result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
 
             }
         }
-
-
-        given("an instance which has two fields of the same type, that need injection, fields annotated correctly") {
-            val testViewClass = ClassWithTwoAnnotatedGuiceInjections::class.java
-            on("deserialization") {
-                val testView = locator.get().getInstance(testViewClass)
-                val output = SerializationUtils.serialize(testView)
-
-                it("populates both fields") {
-                    val result = SerializationUtils.deserialize<ClassWithTwoAnnotatedGuiceInjections>(output)
-                    result.translate.shouldNotBeNull()
-                    isMock(result.translate).shouldBeTrue()
-                    result.serializationSupport.shouldNotBeNull()
-                    result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
-                    result.dummy1.age.shouldEqual(23)
-                    result.dummy2.age.shouldEqual(99)
-                }
-
-
-            }
-        }
-
-        given("an instance which has two fields of the same type, that need injection, one field missing annotation") {
-            val testViewClass = ClassWithMissingGuiceFieldAnnotation::class.java
-            on("deserialization") {
-                val testView = locator.get().getInstance(testViewClass)
-                val output = SerializationUtils.serialize(testView)
-                it(" fails its check") {
-                    val result = { SerializationUtils.deserialize<ClassWithMissingGuiceFieldAnnotation>(output) }
-                    result.shouldThrow(SerializationSupportException::class)
-                }
-            }
-        }
-
-        given("an instance which has two fields of the same type, that need injection, one field missing annotation.  Missing field is excluded") {
-            val testViewClass = ClassWithExcludedField::class.java
-            on("deserialization") {
-                val testView = locator.get().getInstance(testViewClass)
-                val output = SerializationUtils.serialize(testView)
-                it("passes its check") {
-                    val result = SerializationUtils.deserialize<ClassWithExcludedField>(output)
-                    result.translate.shouldNotBeNull()
-                    isMock(result.translate).shouldBeTrue()
-                    result.serializationSupport.shouldNotBeNull()
-                    result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
-                    result.dummy1.shouldBeNull()
-                    result.dummy2.age.shouldEqual(99)
-                }
-            }
-        }
-
-
-        given("an instance which has two fields of the same type, that need injection, fields annotated correctly, but one filled by user code before injection and one after injection") {
-            val testViewClass = ClassWithDeeperInheritanceAndOverridingInjection::class.java
-            on("deserialization") {
-                val testView = locator.get().getInstance(testViewClass)
-                val output = SerializationUtils.serialize(testView)
-
-                it("fills fields by user code action, not injection") {
-                    val result = SerializationUtils.deserialize<ClassWithDeeperInheritanceAndOverridingInjection>(output)
-                    result.translate.shouldNotBeNull()
-                    isMock(result.translate).shouldBeTrue()
-                    result.serializationSupport.shouldNotBeNull()
-                    result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
-                    result.dummy1.age.shouldEqual(123)
-                    result.dummy2.age.shouldEqual(199)
-                    result.dummy3.shouldBeInstanceOf(Dummy2::class.java)
-                }
-            }
-        }
-
-
-        given("an instance which has two fields of the same type, deeper inheritance") {
-            val testViewClass = ClassWithDeeperInheritance::class.java
-            on("deserialization") {
-                val testView = locator.get().getInstance(testViewClass)
-                val output = SerializationUtils.serialize(testView)
-
-                it("fills all fields, with no errors") {
-                    val result = SerializationUtils.deserialize<ClassWithDeeperInheritance>(output)
-                    result.translate.shouldNotBeNull()
-                    isMock(result.translate).shouldBeTrue()
-                    result.serializationSupport.shouldNotBeNull()
-                    result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
-                    result.dummy1.age.shouldEqual(23)
-                    result.dummy2.age.shouldEqual(99)
-                    result.dummy3.shouldBeInstanceOf(Dummy2::class.java)
-                }
-            }
-        }
-
     }
+
+    given("an instance which has two fields that need injection") {
+        on("deserialization") {
+            val output = serialize(ClassWithTwoGuiceInjections::class.java)
+
+            it("populates both fields") {
+                val result = SerializationUtils.deserialize<ClassWithTwoGuiceInjections>(output)
+                result.translate.shouldNotBeNull()
+                isMock(result.translate).shouldBeTrue()
+                result.serializationSupport.shouldNotBeNull()
+                result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
+                result.dummy1.shouldBeInstanceOf(Dummy1::class)
+                result.dummy2.shouldBeInstanceOf(Dummy2::class)
+            }
+
+        }
+    }
+
+
+    given("an instance which has two fields of the same type, that need injection, fields annotated correctly") {
+        on("deserialization") {
+            val output = serialize(ClassWithTwoAnnotatedGuiceInjections::class.java)
+
+            it("populates both fields") {
+                val result = SerializationUtils.deserialize<ClassWithTwoAnnotatedGuiceInjections>(output)
+                result.translate.shouldNotBeNull()
+                isMock(result.translate).shouldBeTrue()
+                result.serializationSupport.shouldNotBeNull()
+                result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
+                result.dummy1.age.shouldEqual(23)
+                result.dummy2.age.shouldEqual(99)
+            }
+
+
+        }
+    }
+
+    given("an instance which has two fields of the same type, that need injection, one field missing annotation") {
+        on("deserialization") {
+            val output = serialize(ClassWithMissingGuiceFieldAnnotation::class.java)
+            it(" fails its check") {
+                val result = { SerializationUtils.deserialize<ClassWithMissingGuiceFieldAnnotation>(output) }
+                result.shouldThrow(SerializationSupportException::class)
+            }
+        }
+    }
+
+    given("an instance which has two fields of the same type, that need injection, one field missing annotation.  Missing field is excluded") {
+        on("deserialization") {
+            val output = serialize(ClassWithExcludedField::class.java)
+            it("passes its check") {
+                val result = SerializationUtils.deserialize<ClassWithExcludedField>(output)
+                result.translate.shouldNotBeNull()
+                isMock(result.translate).shouldBeTrue()
+                result.serializationSupport.shouldNotBeNull()
+                result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
+                result.dummy1.shouldBeNull()
+                result.dummy2.age.shouldEqual(99)
+            }
+        }
+    }
+
+
+    given("an instance which has two fields of the same type, that need injection, fields annotated correctly, but one filled by user code before injection and one after injection") {
+        on("deserialization") {
+            val output = serialize(ClassWithDeeperInheritanceAndOverridingInjection::class.java)
+
+            it("fills fields by user code action, not injection") {
+                val result = SerializationUtils.deserialize<ClassWithDeeperInheritanceAndOverridingInjection>(output)
+                result.translate.shouldNotBeNull()
+                isMock(result.translate).shouldBeTrue()
+                result.serializationSupport.shouldNotBeNull()
+                result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
+                result.dummy1.age.shouldEqual(123)
+                result.dummy2.age.shouldEqual(199)
+                result.dummy3.shouldBeInstanceOf(Dummy2::class.java)
+            }
+        }
+    }
+
+
+    given("an instance which has two fields of the same type, deeper inheritance") {
+        on("deserialization") {
+            val output = serialize(ClassWithDeeperInheritance::class.java)
+
+            it("fills all fields, with no errors") {
+                val result = SerializationUtils.deserialize<ClassWithDeeperInheritance>(output)
+                result.translate.shouldNotBeNull()
+                isMock(result.translate).shouldBeTrue()
+                result.serializationSupport.shouldNotBeNull()
+                result.serializationSupport.shouldBeInstanceOf(DefaultSerializationSupport::class.java)
+                result.dummy1.age.shouldEqual(23)
+                result.dummy2.age.shouldEqual(99)
+                result.dummy3.shouldBeInstanceOf(Dummy2::class.java)
+            }
+        }
+    }
+
 })
 
 fun isMock(obj: Any): Boolean {
