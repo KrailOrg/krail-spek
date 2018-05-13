@@ -69,7 +69,7 @@ class AutoBind : Spek({
 class KotlinWiggly(@Min(3)
                    var name: String, @get:Max(5) var age: Int)
 
-class LocalTestModule : AbstractModule() {
+private class LocalTestModule : AbstractModule() {
     val interpolator: KrailInterpolator = mock()
 
     init {
