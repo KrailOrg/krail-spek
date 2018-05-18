@@ -10,6 +10,13 @@ import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
+import uk.q3c.krail.core.env.BootstrapConfig
+import uk.q3c.krail.core.env.BootstrapLoader
+import uk.q3c.krail.core.env.EnvironmentConfig
+import uk.q3c.krail.core.env.InjectorFactory
+import uk.q3c.krail.core.env.RunningOn
+import uk.q3c.krail.core.env.RuntimeEnvironment
+import uk.q3c.krail.core.env.ServletInjectorLocator
 import uk.q3c.krail.core.shiro.KrailSecurityManager
 import uk.q3c.util.guice.InjectorLocator
 
@@ -47,6 +54,7 @@ class TestBootstrapModule : AbstractModule() {
         whenever(mockBootstrapLoader.load()).thenReturn(bootstrapConfig)
         bind(BootstrapLoader::class.java).toInstance(mockBootstrapLoader)
         bind(InjectorLocator::class.java).to(ServletInjectorLocator::class.java)
+        bind(RuntimeEnvironment::class.java).annotatedWith(RunningOn::class.java).toInstance(RuntimeEnvironment.SERVLET)
     }
 
 }

@@ -13,6 +13,7 @@ import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
+import uk.q3c.krail.core.env.ServletEnvironmentModule
 import uk.q3c.krail.core.validation.KrailInterpolator
 import uk.q3c.krail.i18n.persist.I18NPersistenceHelper
 import uk.q3c.krail.option.persist.ActiveOptionSourceDefault

@@ -8,6 +8,9 @@ import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
+import uk.q3c.krail.core.env.BootstrapConfig
+import uk.q3c.krail.core.env.BootstrapYAMLReader
+import uk.q3c.krail.core.env.KrailVertxBootstrapModule
 import uk.q3c.util.testutil.TestResource
 
 
@@ -32,8 +35,8 @@ object BootstrapConfigTest : Spek({
                     version.shouldEqual(1)
                     collator.shouldBeEqualTo("uk.q3c.krail.core.guice.CoreBindingsCollator")
                     modules.shouldContain("uk.q3c.krail.core.vaadin.DataModule")
-                    servletConfig.additionalModules.shouldContain("uk.q3c.krail.core.guice.ServletEnvironmentModule")
-                    vertxConfig.additionalModules.shouldContain("uk.q3c.krail.core.guice.VertxEnvironmentModule")
+                    servletConfig.additionalModules.shouldContain("uk.q3c.krail.core.env.ServletEnvironmentModule")
+                    vertxConfig.additionalModules.shouldContain("uk.q3c.krail.core.env.VertxEnvironmentModule")
                 }
             }
         }
@@ -48,8 +51,8 @@ object BootstrapConfigTest : Spek({
                     version.shouldEqual(1)
                     collator.shouldBeEqualTo("uk.q3c.krail.core.guice.CoreBindingsCollator")
                     modules.shouldBeEmpty()
-                    servletConfig.additionalModules.shouldContain("uk.q3c.krail.core.guice.ServletEnvironmentModule")
-                    vertxConfig.additionalModules.shouldContain("uk.q3c.krail.core.guice.VertxEnvironmentModule")
+                    servletConfig.additionalModules.shouldContain("uk.q3c.krail.core.env.ServletEnvironmentModule")
+                    vertxConfig.additionalModules.shouldContain("uk.q3c.krail.core.env.VertxEnvironmentModule")
                 }
             }
         }
@@ -64,7 +67,7 @@ object BootstrapConfigTest : Spek({
                     version.shouldEqual(1)
                     collator.shouldBeEqualTo("uk.q3c.krail.core.guice.CoreBindingsCollator")
                     modules.shouldContain("uk.q3c.krail.core.vaadin.DataModule")
-                    servletConfig.additionalModules.shouldContain("uk.q3c.krail.core.guice.ServletEnvironmentModule")
+                    servletConfig.additionalModules.shouldContain("uk.q3c.krail.core.env.ServletEnvironmentModule")
                     vertxConfig.additionalModules.shouldBeEmpty()
                 }
             }

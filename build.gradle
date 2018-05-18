@@ -35,7 +35,7 @@ apply plugin: 'uk.q3c.kaytee'
 apply plugin: 'kotlin'
 apply from : "gradle/spek.gradle"
 
-ext.krailVersion = "0.16.6.0"
+ext.krailVersion = "0.16.7.0"
 
 sourceCompatibility='1.8'
 ext.guiceVersion = '4.1.0'

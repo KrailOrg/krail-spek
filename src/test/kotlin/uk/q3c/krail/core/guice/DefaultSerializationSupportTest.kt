@@ -17,6 +17,7 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import org.mockito.Mockito
+import uk.q3c.krail.core.env.ServletInjectorLocator
 import uk.q3c.krail.core.view.ViewBase
 import uk.q3c.krail.core.view.component.ViewChangeBusMessage
 import uk.q3c.krail.i18n.Translate
@@ -40,7 +41,7 @@ fun <T : Serializable> serialize(testViewClass: Class<out T>): ByteArray? {
 object DefaultSerializationSupportTest : Spek({
 
 
-    given("an instance that needs no guice injections") {
+    given("an instance that needs no env injections") {
 
         on("serialization / deserialization") {
 
