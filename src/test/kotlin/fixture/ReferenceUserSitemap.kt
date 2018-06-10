@@ -13,7 +13,7 @@
 
 package fixture
 
-import com.google.common.collect.Lists
+import com.google.common.collect.ImmutableList
 import com.google.inject.Inject
 import fixture.testviews2.TestLoginView
 import fixture.testviews2.TestLogoutView
@@ -228,17 +228,14 @@ constructor(translate: Translate, uriHandler: URIFragmentHandler, sessionBusProv
         //        addStandardPage(StandardPageKey.Private_Home, privateHomeNode);
     }
 
-    fun createNode(fullURI: String, uriSegment: String, viewClass: Class<out KrailView>, labelKey: I18NKey, pageAccessControl: PageAccessControl, vararg roles: String): UserSitemapNode {
+    fun createNode(fullURI: String, uriSegment: String, viewClass: Class<out KrailView>, labelKey: I18NKey, pageAccessControl: PageAccessControl, roles: List<String> = listOf()): UserSitemapNode {
 
         val collator = Collator.getInstance()
 
-        var r: List<String>? = null
-        if (roles != null) {
-            r = Lists.newArrayList(*roles)
-        }
+        val r: ImmutableList<String> = ImmutableList.copyOf(roles)
         val id = insertionOrder.indexOf(fullURI)
-        val positionIndex = positionIndexes[fullURI]
-        val masterNode = MasterSitemapNode(id, uriSegment, viewClass, labelKey, positionIndex!!, pageAccessControl, r, EmptyViewConfiguration())
+        val positionIndex = positionIndexes[fullURI]!!
+        val masterNode = MasterSitemapNode(id = id, uriSegment = uriSegment, viewClass = viewClass, labelKey = labelKey, positionIndex = positionIndex, pageAccessControl = pageAccessControl, roles = r, viewConfiguration = EmptyViewConfiguration())
 
         val node = UserSitemapNode(masterNode)
         node.label = translate.from(labelKey)
