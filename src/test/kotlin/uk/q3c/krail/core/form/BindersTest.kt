@@ -40,7 +40,7 @@ import javax.validation.constraints.Max
  */
 object BindersTest : Spek({
     given("The Guice bindings for KrailBeanValidationBinderFactory") {
-        val injector = Guice.createInjector(FormModule(), KrailValidationModule(), TestSupportModule())
+        val injector = Guice.createInjector(FormModule(), KrailValidationModule(), TestSupportModule(), ConverterModule())
         InjectorHolder.setInjector(injector)
         val nameField = TextField()
         val ageField = TextField()
@@ -101,7 +101,7 @@ object BindersTest : Spek({
     }
 
     given("The Guice bindings for KrailBeanValidatorFactory") {
-        val injector = Guice.createInjector(FormModule(), ValidationModule(), TestSupportModule())
+        val injector = Guice.createInjector(FormModule(), ValidationModule(), TestSupportModule(), ConverterModule())
         InjectorHolder.setInjector(injector)
         val nameField = TextField()
 

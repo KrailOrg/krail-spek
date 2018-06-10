@@ -38,6 +38,7 @@ import uk.q3c.krail.core.navigate.sitemap.MasterSitemapNode
 import uk.q3c.krail.core.navigate.sitemap.StandardPageKey
 import uk.q3c.krail.core.navigate.sitemap.UserSitemapNode
 import uk.q3c.krail.core.shiro.PageAccessControl
+import uk.q3c.krail.core.view.EmptyViewConfiguration
 import uk.q3c.krail.core.view.KrailView
 import uk.q3c.krail.i18n.I18NKey
 import uk.q3c.krail.i18n.Translate
@@ -237,7 +238,7 @@ constructor(translate: Translate, uriHandler: URIFragmentHandler, sessionBusProv
         }
         val id = insertionOrder.indexOf(fullURI)
         val positionIndex = positionIndexes[fullURI]
-        val masterNode = MasterSitemapNode(id, uriSegment, viewClass, labelKey, positionIndex!!, pageAccessControl, r)
+        val masterNode = MasterSitemapNode(id, uriSegment, viewClass, labelKey, positionIndex!!, pageAccessControl, r, EmptyViewConfiguration())
 
         val node = UserSitemapNode(masterNode)
         node.label = translate.from(labelKey)
