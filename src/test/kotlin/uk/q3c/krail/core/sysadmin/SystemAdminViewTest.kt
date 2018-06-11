@@ -1,4 +1,4 @@
-package uk.q3c.krail.core.uk.q3c.krail.core.sysadmin
+package uk.q3c.krail.core.sysadmin
 
 import io.mockk.every
 import io.mockk.mockk
@@ -8,7 +8,6 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import uk.q3c.krail.core.navigate.Navigator
-import uk.q3c.krail.core.sysadmin.SystemAdminView
 import uk.q3c.krail.core.view.component.ViewChangeBusMessage
 import uk.q3c.krail.i18n.test.MockTranslate
 import uk.q3c.util.guice.SerializationSupport
