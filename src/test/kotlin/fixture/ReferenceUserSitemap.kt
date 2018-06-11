@@ -235,7 +235,7 @@ constructor(translate: Translate, uriHandler: URIFragmentHandler, sessionBusProv
         val r: ImmutableList<String> = ImmutableList.copyOf(roles)
         val id = insertionOrder.indexOf(fullURI)
         val positionIndex = positionIndexes[fullURI]!!
-        val masterNode = MasterSitemapNode(id = id, uriSegment = uriSegment, viewClass = viewClass, labelKey = labelKey, positionIndex = positionIndex, pageAccessControl = pageAccessControl, roles = r, viewConfiguration = EmptyViewConfiguration())
+        val masterNode = MasterSitemapNode(id = id, uriSegment = uriSegment, viewClass = viewClass, labelKey = labelKey, positionIndex = positionIndex, pageAccessControl = pageAccessControl, roles = r, viewConfiguration = EmptyViewConfiguration::class.java)
 
         val node = UserSitemapNode(masterNode)
         node.label = translate.from(labelKey)
