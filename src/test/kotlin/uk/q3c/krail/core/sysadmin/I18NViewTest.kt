@@ -47,7 +47,7 @@ object I18NViewTest : Spek({
             view.beforeBuild(navigationStateExt)
             view.buildView()
 
-            it("has the correct compoenent values") {
+            it("has the correct component values") {
                 view.rootComponent.shouldNotBeNull()
                 view.instructions1.value.shouldBeEqualTo("instruction1 text")
                 view.instructions2.value.shouldBeEqualTo("\ninstruction2 text")
