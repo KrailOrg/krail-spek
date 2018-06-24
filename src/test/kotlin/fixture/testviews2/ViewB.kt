@@ -18,12 +18,24 @@ import com.vaadin.ui.Label
 import fixture.TestViewChangeListener
 import uk.q3c.krail.core.navigate.NavigationState
 import uk.q3c.krail.core.view.KrailView
+import uk.q3c.krail.core.view.NavigationStateExt
 import uk.q3c.krail.core.view.component.AfterViewChangeBusMessage
 import uk.q3c.krail.core.view.component.ViewChangeBusMessage
 import uk.q3c.krail.i18n.I18NKey
 
 class ViewB @Inject
 constructor(private val changeListener: TestViewChangeListener) : KrailView {
+    override fun beforeBuild(navigationStateExt: NavigationStateExt?) {
+        TODO()
+    }
+
+    override fun buildView() {
+        TODO()
+    }
+
+    override fun afterBuild() {
+        TODO()
+    }
 
 
     private val label = Label("not used")

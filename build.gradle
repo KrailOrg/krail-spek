@@ -55,6 +55,7 @@ repositories {
 kaytee {
     version {
         number =  krailVersion // this must match krail core
+        qualifier = 0
     }
 
   }

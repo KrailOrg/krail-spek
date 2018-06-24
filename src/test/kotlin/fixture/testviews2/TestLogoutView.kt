@@ -15,11 +15,23 @@ package fixture.testviews2
 import com.vaadin.ui.Component
 import com.vaadin.ui.Label
 import uk.q3c.krail.core.view.LogoutView
+import uk.q3c.krail.core.view.NavigationStateExt
 import uk.q3c.krail.core.view.component.AfterViewChangeBusMessage
 import uk.q3c.krail.core.view.component.ViewChangeBusMessage
 import uk.q3c.krail.i18n.I18NKey
 
 class TestLogoutView : LogoutView {
+    override fun beforeBuild(navigationStateExt: NavigationStateExt?) {
+        TODO()
+    }
+
+    override fun buildView() {
+        TODO()
+    }
+
+    override fun afterBuild() {
+        TODO()
+    }
 
 
     override fun beforeBuild(busMessage: ViewChangeBusMessage) {

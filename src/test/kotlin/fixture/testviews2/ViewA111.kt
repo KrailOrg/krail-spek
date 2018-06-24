@@ -14,11 +14,23 @@ package fixture.testviews2
 
 import com.vaadin.ui.Component
 import uk.q3c.krail.core.view.KrailView
+import uk.q3c.krail.core.view.NavigationStateExt
 import uk.q3c.krail.core.view.component.AfterViewChangeBusMessage
 import uk.q3c.krail.core.view.component.ViewChangeBusMessage
 import uk.q3c.krail.i18n.I18NKey
 
 class ViewA111 : KrailView {
+    override fun beforeBuild(navigationStateExt: NavigationStateExt?) {
+        TODO()
+    }
+
+    override fun buildView() {
+        TODO()
+    }
+
+    override fun afterBuild() {
+        TODO()
+    }
 
 
     override fun beforeBuild(busMessage: ViewChangeBusMessage) {

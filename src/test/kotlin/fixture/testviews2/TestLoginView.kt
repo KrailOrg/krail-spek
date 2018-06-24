@@ -18,11 +18,23 @@ import com.vaadin.ui.Label
 import com.vaadin.ui.PasswordField
 import com.vaadin.ui.TextField
 import uk.q3c.krail.core.user.LoginView
+import uk.q3c.krail.core.view.NavigationStateExt
 import uk.q3c.krail.core.view.component.AfterViewChangeBusMessage
 import uk.q3c.krail.core.view.component.ViewChangeBusMessage
 import uk.q3c.krail.i18n.I18NKey
 
 class TestLoginView : LoginView {
+    override fun buildView() {
+        TODO()
+    }
+
+    override fun afterBuild() {
+        TODO()
+    }
+
+    override fun beforeBuild(navigationStateExt: NavigationStateExt?) {
+        TODO()
+    }
 
     override val submit: Button
         get() = Button()
